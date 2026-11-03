@@ -1,3 +1,6 @@
+import subprocess
+
+
 def read_file(path:str)->str:
     try:
         with open(path,"r",encoding="utf-8")as file:
@@ -13,6 +16,28 @@ def write_file(path:str,content:str)->str:
     except(OSError,UnicodeError) as e:
         return f"Error writing file:{e}"
 
+#执行命令
+def execute_command(command:str)->str:
+    try:
+        result =subprocess.run(
+            command,
+            shell=True,#交给系统的解释器
+            capture_output=True,#收集输出
+            text=True,#解码为字符串
+            errors="replace",#遇到无法解码的就替换，避免解码报错
+            timeout=30,
+        )
+
+        output=result.stdout + result.stderr
+
+        if result.returncode!=0:
+            return f"Command failed (exit code {result.returncode}):\n{output}"
+
+        return output if output else "(Command executed with no output)"
+    except subprocess.TimeoutExpired:
+        return "Error: Command timed out after 30 seconds."
+    except OSError as e:
+        return f"Error executing command: {e}"
 
 
 #只有作为main调用是才会执行，其他导入时不执行，这个__的作用
@@ -36,3 +61,15 @@ if __name__=="__main__":
 
     print("测试五：父文件夹不存在")
     print(write_file("missing_folder/output.txt", "测试"))
+
+    print("测试六：执行正常命令")
+    print(execute_command("echo Hello Agent"))
+
+    print("测试七：列出当前目录")
+    print(execute_command("dir /b"))
+
+    print("测试八：执行不存在的命令")
+    print(execute_command("this_command_does_not_exist_123"))
+
+    print("测试九：验证超时")
+    print(execute_command('powershell.exe -NoProfile -Command "Start-Sleep -Seconds 35"'))
