@@ -14,4 +14,4 @@ response=client.chat.completions.create(
     ],
 )
 
-print(response.choices[0].message.content)
+print(response.model_dump_json(indent=2))
