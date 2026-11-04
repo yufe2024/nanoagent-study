@@ -39,6 +39,20 @@ def execute_command(command:str)->str:
     except OSError as e:
         return f"Error executing command: {e}"
 
+FUNCTIONS={
+    "read_file":read_file,
+}
+
+def call_tool(name:str,arguments:dict)->str:
+    function = FUNCTIONS.get(name)
+
+    if function is None:
+        return f"Error: Unknown tool '{name}'"
+
+    return function(**arguments)
+
+
+
 
 #只有作为main调用是才会执行，其他导入时不执行，这个__的作用
 if __name__=="__main__":
@@ -71,5 +85,13 @@ if __name__=="__main__":
     print("测试八：执行不存在的命令")
     print(execute_command("this_command_does_not_exist_123"))
 
-    print("测试九：验证超时")
-    print(execute_command('powershell.exe -NoProfile -Command "Start-Sleep -Seconds 35"'))
+    #print("测试九：验证超时")
+    #print(execute_command('powershell.exe -NoProfile -Command "Start-Sleep -Seconds 35"'))
+
+    print("测试十：通过名称调用读取工具")
+    name = "read_file"
+    arguments = {"path": "notes.txt"}
+    print(call_tool(name, arguments))
+
+    print("测试十一：调用不存在的工具")
+    print(call_tool("unknown_tool", {}))
