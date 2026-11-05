@@ -40,6 +40,29 @@ TOOLS=[
             }
         },
     },
+    {
+        "type":"function",
+        "function":{
+            "name":"execute_command",
+            #这里加括号的作用是将长串分行写，最后仍得到一个字符串
+            "description":(
+                "在 Windows 上通过 cmd.exe 执行命令，返回命令输出或错误信息。"
+                "工作目录是程序当前工作目录，等待超时为 30 秒。"
+                "使用 CMD 命令语法，不要使用 Bash 或 PowerShell 专属语法。"
+            ),
+            "parameters":{
+                "type":"object",
+                "properties":{
+                    "command":{
+                        "type":"string",
+                        "description":"要执行的cmd命令例如die/b *.txt",
+                    },
+                },
+                "required":["command"]
+            },
+        },
+
+    },
 ]
 
 

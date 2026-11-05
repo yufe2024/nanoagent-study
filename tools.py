@@ -39,10 +39,15 @@ def execute_command(command:str)->str:
     except OSError as e:
         return f"Error executing command: {e}"
 
+
+
 FUNCTIONS={
     "read_file":read_file,
-    "write_file":write_file
+    "write_file":write_file,
+    "execute_command": execute_command,
 }
+
+
 
 def call_tool(name:str,arguments:dict)->str:
     function = FUNCTIONS.get(name)
