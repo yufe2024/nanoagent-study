@@ -1,5 +1,6 @@
 import os
 import json
+import sys
 from tool_definitions import TOOLS
 from openai import OpenAI
 from tools import call_tool
@@ -31,7 +32,6 @@ def run_agent(task:str,max_iterations:int=5)->str:
         )
 
         message=response.choices[0].message
-        print(message.content)
         messages.append(message.model_dump(exclude_none=True))
 
         if not message.tool_calls:
@@ -95,11 +95,13 @@ def run_agent(task:str,max_iterations:int=5)->str:
 #     print(final_response.choices[0].message.content)
 # else:
 #     print("模型回复：",message.content)
-if __name__ == "__main__":
-    result = run_agent(
-        "先列出当前目录的文本文件。"
-        "如果其中有 notes.txt，读取它，告诉我项目名称。"
-        "本次只查看，不修改文件。"
-    )
+if __name__=="__main__":
+    task=" ".join(sys.argv[1:]).strip()
+
+    if not task:
+        print('使用方法：python main.py "你的任务"')
+        sys.exit(1)
+    result=run_agent(task)
+
     print("\n最终结果：")
     print(result)
