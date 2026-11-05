@@ -97,7 +97,9 @@ def run_agent(task:str,max_iterations:int=5)->str:
 #     print("模型回复：",message.content)
 if __name__ == "__main__":
     result = run_agent(
-        "先读取 notes.txt，再读取其中指定的项目详情文件，最后总结项目情况。"
+        "先读取 notes.txt，再读取其中指定的项目详情文件。"
+        "根据文件内容生成简短总结，并调用 write_file 保存到 summary.txt。"
+        "保存成功后告诉我文件路径。"
     )
     print("\n最终结果：")
     print(result)

@@ -17,7 +17,29 @@ TOOLS=[
             "required":["path"],
             },
         },
-    }
+    },
+    {
+        "type":"function",
+        "function":{
+            "name":"write_file",
+            "description":"将文本写入本地UTF-8文件。文件不存在时创建，同时覆盖原内容",
+            "parameters":{
+                "type":"object",
+                "properties":{
+                    "path":{
+                        "type":"string",
+                        "description":"要写入的文件路径",
+                    },
+                    "content":{
+                        "type":"string",
+                        "description":"要保存到文件中的完整文本",
+                    }
+                },
+                "requeried":["path","content"],
+
+            }
+        },
+    },
 ]
 
 

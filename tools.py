@@ -41,6 +41,7 @@ def execute_command(command:str)->str:
 
 FUNCTIONS={
     "read_file":read_file,
+    "write_file":write_file
 }
 
 def call_tool(name:str,arguments:dict)->str:
