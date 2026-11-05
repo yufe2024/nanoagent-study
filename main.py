@@ -2,6 +2,8 @@ import os
 import json
 from tool_definitions import TOOLS
 from openai import OpenAI
+from tools import call_tool
+
 
 client = OpenAI(
     api_key=os.environ["DEEPSEEK_API_KEY"],
@@ -26,15 +28,26 @@ response=client.chat.completions.create(
 message=response.choices[0].message
 
 if message.tool_calls:
+    messages.append(message.model_dump(exclude_none=True))
+
     for tool_call in message.tool_calls:
         name=tool_call.function.name
-        raw_arguments=tool_call.function.arguments
-        arguments=json.loads(raw_arguments)
+        arguments=json.loads(tool_call.function.arguments)
 
-        print("调用编号：", tool_call.id)
-        print("工具名称：", name)
-        print("原始参数：", raw_arguments)
-        print("解析后的参数：", arguments)
-        print("参数类型：", type(arguments))
+        result = call_tool(name,arguments)
+        print("工具执行结果",result)
+
+        messages.append({
+            "role":"tool",
+            "tool_call_id":tool_call.id,
+            "content":result,
+        })
+
+    final_response=client.chat.completions.create(
+        model="deepseek-flash",
+        messages=messages,
+    )
+    print("模型总结:")
+    print(final_response.choices[0].message.content)
 else:
-    print("模型没有调用工具，回复为：", message.content)
+    print("模型回复：",message.content)
