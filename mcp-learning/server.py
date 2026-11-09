@@ -61,6 +61,12 @@ async def get_forecast(latitude: float, longitude: float) -> str:
         latitude: 纬度，例如 38.8977。
         longitude: 经度，例如 -77.0365。
     """
+    if not -90 <= latitude <= 90:
+        raise ValueError("纬度必须在 -90 到 90 之间")
+
+    if not -180 <= longitude <= 180:
+        raise ValueError("经度必须在 -180 到 180 之间")
+
     # 第一次请求：获取这个地点的天气预报地址
     points_url = (
         f"https://api.weather.gov/points/{latitude},{longitude}"

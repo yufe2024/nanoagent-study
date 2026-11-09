@@ -1,6 +1,7 @@
 import asyncio
 import sys
 from pathlib import Path
+import json
 
 from mcp import Client,StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -18,18 +19,36 @@ async def main():
     async with Client(stdio_client(params)) as client:
         tool_list=await client.list_tools()
 
+        model_tools=[]
+
         for tool in tool_list.tools:
-            print("工具名称:",tool.name)
-            print("工具说明：",tool.description)
-            print("参数要求：", tool.input_schema)
+            model_tools.append({
+                "type": "function",
+                "function": {
+                    "name": tool.name,
+                    "description": tool.description or "",
+                    "parameters": tool.input_schema,
+                },
+            })
+        print(json.dumps(
+            model_tools,
+            ensure_ascii=False,
+            indent=2,
+        ))
 
         result = await client.call_tool(
             "get_forecast",
             {
-                "latitude": 38.8977,
+                "latitude": 200,
                 "longitude": -77.0365,
             },
         )
+
+        print("调用是否失败：", result.is_error)
+
+        for block in result.content:
+            if isinstance(block, TextContent):
+                print("工具返回：", block.text)
 
         print("调用是否失败：", result.is_error)
 
