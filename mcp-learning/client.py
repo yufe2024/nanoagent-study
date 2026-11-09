@@ -23,9 +23,13 @@ async def main():
             print("工具说明：",tool.description)
             print("参数要求：", tool.input_schema)
 
-        result=await client.call_tool("add",{"a":2,"b":3})
+        result = await client.call_tool("get_alerts", {"state": "CA"})
 
-        print("调用是否失败",result.is_error)
+        print("调用是否失败：", result.is_error)
+
+        for block in result.content:
+            if isinstance(block, TextContent):
+                print("工具返回：", block.text)
 
     for block in result.content:
         if isinstance(block,TextContent):
