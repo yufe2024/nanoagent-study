@@ -1,11 +1,12 @@
 import asyncio
 import sys
-from pathlib import Path
+import os
 import json
 
+from pathlib import Path
 from mcp import Client,StdioServerParameters
 from mcp.client.stdio import stdio_client
-from mcp_types import TextContent
+from openai import AsyncOpenAI
 
 async def main():
 
@@ -30,35 +31,40 @@ async def main():
                     "parameters": tool.input_schema,
                 },
             })
-        print(json.dumps(
-            model_tools,
-            ensure_ascii=False,
-            indent=2,
-        ))
 
-        result = await client.call_tool(
-            "get_forecast",
-            {
-                "latitude": 200,
-                "longitude": -77.0365,
-            },
-        )
+        async with AsyncOpenAI(
+            api_key=os.environ["DEEPSEEK_API_KEY"],
+            base_url="https://api.deepseek.com",
+        ) as model_client:
 
-        print("调用是否失败：", result.is_error)
+            response=await model_client.chat.completions.create(
+                model="deepseek-flash",
+                messages=[
+                    {
+                        "role":"system",
+                        "content":"你是一个助手，计算加法时请使用提供的工具。"
+                    },
+                    {
+                        "role":"user",
+                        "content":"请使用工具计算12加30"
+                    },
+            ],
+            tools=model_tools,
+                extra_body={"thinking":{"type":"disabled"}},
+            )
 
-        for block in result.content:
-            if isinstance(block, TextContent):
-                print("工具返回：", block.text)
+        message = response.choices[0].message
 
-        print("调用是否失败：", result.is_error)
+        print("模型文字：", message.content)
 
-        for block in result.content:
-            if isinstance(block, TextContent):
-                print("工具返回：", block.text)
+        if message.tool_calls:
+            for call in message.tool_calls:
+                print("调用编号：", call.id)
+                print("工具名称：", call.function.name)
 
-    for block in result.content:
-        if isinstance(block,TextContent):
-            print("计算结果：",block.text)
-
+                arguments = json.loads(call.function.arguments)
+                print("工具参数：", arguments)
+        else:
+            print("模型没有请求调用工具。")
 if __name__ == "__main__":
     asyncio.run(main())
