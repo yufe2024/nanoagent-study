@@ -23,7 +23,13 @@ async def main():
             print("工具说明：",tool.description)
             print("参数要求：", tool.input_schema)
 
-        result = await client.call_tool("get_alerts", {"state": "CA"})
+        result = await client.call_tool(
+            "get_forecast",
+            {
+                "latitude": 38.8977,
+                "longitude": -77.0365,
+            },
+        )
 
         print("调用是否失败：", result.is_error)
 
