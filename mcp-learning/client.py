@@ -11,6 +11,11 @@ from mcp_types import TextContent
 
 
 async def main():
+    task = " ".join(sys.argv[1:]).strip()
+
+    if not task:
+        print('用法：python client.py "你想让助手完成的任务"')
+        return
     # 找到同目录下的服务器文件
     server_path = Path(__file__).resolve().with_name("server.py")
 
@@ -57,7 +62,7 @@ async def main():
                 },
                 {
                     "role": "user",
-                    "content": "请使用工具计算 12 加 30。",
+                    "content": task,
                 },
             ]
 
